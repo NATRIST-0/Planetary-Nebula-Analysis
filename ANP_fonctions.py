@@ -40,7 +40,7 @@ def on_pushButton_import_clicked():
                 data_import = data_import[['Line', 'Imes']]
                 
                 # Remplacer les valeurs vides par None
-                data_import[['Line', 'Imes']] = data_import[['Line', 'Imes']].replace("", None)
+                data_import[['Line', 'Imes']] = data_import[['Line', 'Imes']].replace(" ", None)
                 
                 # Afficher les données importées
                 print(data_import)
@@ -70,8 +70,8 @@ def adjustTableWidgetSize(table):
         table_height += table.rowHeight(row)
 
     # Ajouter des marges si nécessaire
-    table_width += 30  # Pour les bords et le défilement horizontal
-    table_height += 30  # Pour les bords et le défilement vertical
+    table_width += 50  # Pour les bords et le défilement horizontal
+    table_height += 50  # Pour les bords et le défilement vertical
 
     # Redimensionner le widget de la table
     table.setFixedSize(table_width, table_height)
@@ -135,3 +135,47 @@ class TableModel(QAbstractTableModel):
         self.beginResetModel()
         self._data = data
         self.endResetModel()
+
+def theme(self):
+    self.setStyleSheet("""
+        QWidget {
+            background-color: #2E3440;
+            color: #D8DEE9;
+        }
+        QPushButton {
+            background-color: #4C566A;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+        QPushButton:hover {
+            background-color: #81A1C1;
+        }
+        QTableWidget {
+            background-color: #3B4252;
+            color: #D8DEE9;
+            gridline-color: #4C566A;
+        }
+        QTableWidget::item {
+            padding: 5px;
+        }
+        QTableWidget::item:selected {
+            background-color: #5E81AC;
+        }
+        QHeaderView::section {
+            background-color: #4C566A;
+            color: #D8DEE9;
+            padding: 5px;
+        }
+        QHeaderView::section:checked {
+            background-color: #5E81AC;
+        }
+        QHeaderView::section:pressed {
+            background-color: #81A1C1;
+        }
+        QHeaderView::section::vertical {
+            border-right: 1px solid #4C566A;
+        }
+        QHeaderView::section::horizontal {
+            border-bottom: 1px solid #4C566A;
+        }
+    """)

@@ -7,6 +7,7 @@ class Window(QMainWindow):
         super().__init__()
         # Configuration de la fenêtre principale
         self.setGeometry(50, 50, 1920, 1080)
+        af.theme(self)
 
         # Initialisation de l'interface graphique
         self.ui_main_window = Ui_MainWindow()
@@ -19,19 +20,19 @@ class Window(QMainWindow):
         # Données et en-têtes de table1
         headers_table1 = ["λ (Å)", "Raie", "I₀Gauss", "I₀/I(Hβ)=100", "I_c", "Δ%"]
         data_table1 = [
-            [4340.47, "H I", None, None, None, None],
-            [4363.21, "[O III]", None, None, None, None],
-            [4685.68, "He II", None, None, None, None],
-            [4861.33, "H I", None, None, None, None],
-            [4958.92, "[O III]", None, None, None, None],
-            [5006.85, "[O III]", None, None, None, None],
-            [5754.57, "[N II]", None, None, None, None],
-            [5875.65, "He I", None, None, None, None],
-            [6548.06, "[N II]", None, None, None, None],
-            [6562.82, "H I", None, None, None, None],
-            [6583.39, "[N II]", None, None, None, None],
-            [6716.50, "[S II]", None, None, None, None],
-            [6730.70, "[S II]", None, None, None, None],
+            [4340.47, "H I", "", "", "", ""],
+            [4363.21, "[O III]", "", "", "", ""],
+            [4685.68, "He II", "", "", "", ""],
+            [4861.33, "H I", "", "", "", ""],
+            [4958.92, "[O III]", "", "", "", ""],
+            [5006.85, "[O III]", "", "", "", ""],
+            [5754.57, "[N II]", "", "", "", ""],
+            [5875.65, "He I", "", "", "", ""],
+            [6548.06, "[N II]", "", "", "", ""],
+            [6562.82, "H I", "", "", "", ""],
+            [6583.39, "[N II]", "", "", "", ""],
+            [6716.50, "[S II]", "", "", "", ""],
+            [6730.70, "[S II]", "", "", "", ""],
         ]
 
         # Création et assignation du modèle
@@ -50,9 +51,9 @@ class Window(QMainWindow):
         # Données et en-têtes de table2
         headers_table2 = ["n", "Raie", "Valeur mesurée", "Valeur théorique", "ReBleuiement"]
         data_table2 = [
-            [3, "Hα", None, None, None, None],
-            [4, "Hβ", None, None, None, None],
-            [5, "Hγ", None, None, None, None],
+            [3, "Hα", "", "", "", ""],
+            [4, "Hβ", "", "", "", ""],
+            [5, "Hγ", "", "", "", ""],
         ]
 
         # Création et assignation du modèle
