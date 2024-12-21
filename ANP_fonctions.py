@@ -54,9 +54,8 @@ def on_pushButton_import_clicked():
             print("Aucun fichier sélectionné.")
 
 # Fonction pour ajuster la taille du widget de la table en fonction du contenu
-def adjustTableWidgetSize(self):
+def adjustTableWidgetSize(table):
     # Calculer la taille optimale de la table
-    table = self.ui_main_window.table1
     row_count = table.model().rowCount()
     column_count = table.model().columnCount()
 
