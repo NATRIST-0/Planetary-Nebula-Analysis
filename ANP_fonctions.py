@@ -5,6 +5,7 @@ import PyQt6.QtWidgets as QtWidgets
 from PyQt6.QtWidgets import QFileDialog, QTableWidgetItem
 from PyQt6.QtCore import Qt, QAbstractTableModel
 import pandas as pd
+import numpy as np
 
 def remplir_tableau(table1, data_import):
     if data_import is None:
@@ -16,10 +17,48 @@ def remplir_tableau(table1, data_import):
     # Récupérer le modèle
     model = table1.model()
     
-    # Mettre à jour les données dans le modèle
+    # Step 1: Populate the necessary data in the model
     for i in range(len(data_Imes)):
-        index = model.index(i, 2)  # Colonne 2 pour 'I₀Gauss'
-        model.setData(index, str(data_Imes[i]), Qt.ItemDataRole.DisplayRole)
+        index2 = model.index(i, 2)  # Colonne 2 pour 'I₀Gauss'
+        model.setData(index2, str(data_Imes[i]), Qt.ItemDataRole.DisplayRole)
+
+        index3 = model.index(i, 3)  # Colonne 3 pour 'I₀/I(Hβ)=100'
+        rapport_I = data_Imes[i] / data_Imes[3] * 100
+        model.setData(index3, f"{rapport_I:.1f}", Qt.ItemDataRole.DisplayRole)
+
+    # Step 2: Calculate cHβ
+    try:
+        index = model.index(9, 3)
+        if index.isValid():
+            data = index.data()
+            if data:
+                cHβ = 3.08 * np.log10(float(data)) - 7.55
+            else:
+                raise ValueError("No data in cell")
+        else:
+            raise ValueError("Invalid index")
+    except (ValueError, TypeError) as e:
+        print(f"Error: {e}")
+        cHβ = 3.08 * np.log10(1) - 7.55
+
+    # Step 3: Update the model with the calculated cHβ
+    for i in range(len(data_Imes)):
+        index3 = model.index(i, 3)
+        rapport_I_row = float(index3.data()) if index3.data() else 0
+        
+        index4 = model.index(i, 4)  # Colonne 4 pour 'I_c'
+        wavelength = model.index(i, 0).data()
+        wavelength = float(wavelength) if wavelength else 0
+        
+        f_lambda = 2.5634 * (wavelength/10000)**2 - 4.873 * (wavelength/10000) + 1.7636
+        I_c = rapport_I_row * 10**(cHβ * f_lambda)
+        
+        model.setData(index4, f"{I_c:.1f}", Qt.ItemDataRole.DisplayRole)
+
+        index5 = model.index(i, 5)  # Colonne 5 pour 'Δ%'
+        model.setData(index5, f"{(rapport_I_row - I_c) / I_c * 100:.0f}", Qt.ItemDataRole.DisplayRole)
+
+        table1.resizeColumnsToContents()
 
     return table1
 
@@ -70,7 +109,7 @@ def adjustTableWidgetSize(table):
         table_height += table.rowHeight(row)
 
     # Ajouter des marges si nécessaire
-    table_width += 50  # Pour les bords et le défilement horizontal
+    table_width += 55  # Pour les bords et le défilement horizontal
     table_height += 50  # Pour les bords et le défilement vertical
 
     # Redimensionner le widget de la table
