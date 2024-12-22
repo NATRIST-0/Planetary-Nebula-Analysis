@@ -16,6 +16,7 @@ def remplir_tableau(table1, data_import):
     
     # Récupérer le modèle
     model = table1.model()
+    print(model)
     
     # Step 1: Populate the necessary data in the model
     for i in range(len(data_Imes)):

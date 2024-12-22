@@ -2,13 +2,15 @@ from PyQt6.QtWidgets import QApplication, QMainWindow
 from ANP import Ui_MainWindow
 import ANP_fonctions as af
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QColor
+
 
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         # Configuration de la fenêtre principale
         self.setGeometry(50, 50, 1920, 1080)
-        af.theme(self)
+        #af.theme(self)
 
         # Initialisation de l'interface graphique
         self.ui_main_window = Ui_MainWindow()
@@ -44,19 +46,61 @@ class Window(QMainWindow):
             [6716.50, "[S II]", "", "", "", ""],
             [6730.70, "[S II]", "", "", "", ""],
         ]
+        class TableModel(af.TableModel):
+            def __init__(self, data, headers, tooltips):  # Ajout du paramètre tooltips
+                super().__init__(data, headers)
+                self._data = data
+                self._headers = headers
+                self._tooltips = tooltips  # Stockage des tooltips
+                # Définir les couleurs pour les indices des lignes
+                self.index_colors = [
+                    QColor(68, 67, 255),    # 4340,47 Å - Bleu clair
+                    QColor(64, 63, 255),    # 4363,21 Å - Bleu clair
+                    QColor(12, 92, 255),    # 4685,68 Å - Bleu
+                    QColor(0, 156, 255),    # 4861,33 Å - Bleu clair
+                    QColor(0, 209, 255),    # 4958,92 Å - Bleu clair
+                    QColor(0, 255, 255),    # 5006,85 Å - Cyan
+                    QColor(255, 204, 0),    # 5754,57 Å - Jaune-orange
+                    QColor(255, 190, 0),    # 5875,65 Å - Jaune
+                    QColor(255, 73, 0),     # 6548,06 Å - Orange
+                    QColor(255, 0, 0),      # 6562,82 Å - Rouge
+                    QColor(255, 0, 0),      # 6583,39 Å - Rouge
+                    QColor(255, 0, 0),      # 6716,5 Å - Rouge
+                    QColor(255, 0, 0)       # 6730,7 Å - Rouge
+                ]
 
-        # Création d'une classe modèle personnalisée avec des tooltips
-        class TableModelWithTooltips(af.TableModel):
             def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
                 if orientation == Qt.Orientation.Horizontal:
                     if role == Qt.ItemDataRole.DisplayRole:
                         return self._headers[section]
                     elif role == Qt.ItemDataRole.ToolTipRole:
-                        return window.ToolTips[section]
+                        return self._tooltips[section]  # Utilisation des tooltips stockés
+
+                if orientation == Qt.Orientation.Vertical:
+                    if role == Qt.ItemDataRole.DisplayRole:
+                        return str("")  # Numérotation des lignes
+                    if role == Qt.ItemDataRole.BackgroundRole:
+                        return self.index_colors[section % len(self.index_colors)]
+
                 return None
 
+            def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+                if not index.isValid():
+                    return None
+                    
+                if role == Qt.ItemDataRole.DisplayRole:
+                    return str(self._data[index.row()][index.column()])
+                    
+                return None
+
+            def rowCount(self, parent=None):
+                return len(self._data)
+
+            def columnCount(self, parent=None):
+                return len(self._headers)
+
         # Création et assignation du modèle avec tooltips
-        model1 = TableModelWithTooltips(data_table1, self.headers_table1)
+        model1 = TableModel(data_table1, self.headers_table1, self.ToolTips)
         self.ui_main_window.table1.setModel(model1)
         
         # Ajuster la taille des colonnes et des lignes automatiquement
