@@ -1,8 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from ANP import Ui_MainWindow
 import ANP_fonctions as af
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor
 
 
 class Window(QMainWindow):
@@ -10,7 +8,7 @@ class Window(QMainWindow):
         super().__init__()
         # Configuration de la fenêtre principale
         self.setGeometry(50, 50, 1920, 1080)
-        #af.theme(self)
+        af.theme(self)
 
         # Initialisation de l'interface graphique
         self.ui_main_window = Ui_MainWindow()
@@ -22,7 +20,7 @@ class Window(QMainWindow):
     
         # Données et en-têtes de table1
         self.headers_table1 = ["λ (Å)", "Raie", "I₀Gauss", "I₀/I(Hβ)=100", " I_c ", "Δ%"]
-        self.ToolTips = [
+        self.ToolTips1 = [
             "Longueur d'onde en Angströms",
             "Nom de la raie spectrale",
             "Intensité observée (Gauss)",
@@ -46,61 +44,10 @@ class Window(QMainWindow):
             [6716.50, "[S II]", "", "", "", ""],
             [6730.70, "[S II]", "", "", "", ""],
         ]
-        class TableModel(af.TableModel):
-            def __init__(self, data, headers, tooltips):  # Ajout du paramètre tooltips
-                super().__init__(data, headers)
-                self._data = data
-                self._headers = headers
-                self._tooltips = tooltips  # Stockage des tooltips
-                # Définir les couleurs pour les indices des lignes
-                self.index_colors = [
-                    QColor(68, 67, 255),    # 4340,47 Å - Bleu clair
-                    QColor(64, 63, 255),    # 4363,21 Å - Bleu clair
-                    QColor(12, 92, 255),    # 4685,68 Å - Bleu
-                    QColor(0, 156, 255),    # 4861,33 Å - Bleu clair
-                    QColor(0, 209, 255),    # 4958,92 Å - Bleu clair
-                    QColor(0, 255, 255),    # 5006,85 Å - Cyan
-                    QColor(255, 204, 0),    # 5754,57 Å - Jaune-orange
-                    QColor(255, 190, 0),    # 5875,65 Å - Jaune
-                    QColor(255, 73, 0),     # 6548,06 Å - Orange
-                    QColor(255, 0, 0),      # 6562,82 Å - Rouge
-                    QColor(255, 0, 0),      # 6583,39 Å - Rouge
-                    QColor(255, 0, 0),      # 6716,5 Å - Rouge
-                    QColor(255, 0, 0)       # 6730,7 Å - Rouge
-                ]
 
-            def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
-                if orientation == Qt.Orientation.Horizontal:
-                    if role == Qt.ItemDataRole.DisplayRole:
-                        return self._headers[section]
-                    elif role == Qt.ItemDataRole.ToolTipRole:
-                        return self._tooltips[section]  # Utilisation des tooltips stockés
-
-                if orientation == Qt.Orientation.Vertical:
-                    if role == Qt.ItemDataRole.DisplayRole:
-                        return str("")  # Numérotation des lignes
-                    if role == Qt.ItemDataRole.BackgroundRole:
-                        return self.index_colors[section % len(self.index_colors)]
-
-                return None
-
-            def data(self, index, role=Qt.ItemDataRole.DisplayRole):
-                if not index.isValid():
-                    return None
-                    
-                if role == Qt.ItemDataRole.DisplayRole:
-                    return str(self._data[index.row()][index.column()])
-                    
-                return None
-
-            def rowCount(self, parent=None):
-                return len(self._data)
-
-            def columnCount(self, parent=None):
-                return len(self._headers)
 
         # Création et assignation du modèle avec tooltips
-        model1 = TableModel(data_table1, self.headers_table1, self.ToolTips)
+        model1 = af.TableModel2(data_table1, self.headers_table1, self.ToolTips1)
         self.ui_main_window.table1.setModel(model1)
         
         # Ajuster la taille des colonnes et des lignes automatiquement
@@ -113,7 +60,7 @@ class Window(QMainWindow):
 ##############################################################################################################
 
         # Données et en-têtes de table2
-        headers_table2 = ["n", "Raie", "Valeur mesurée", "Valeur théorique", "ReBleuiement"]
+        headers_table2 = ["n", "Raie", "Valeur mesurée", "Valeur théorique", "Rebleuïssement"]
         data_table2 = [
             [3, "Hα", "", "", ""],
             [4, "Hβ", "", "", ""],
@@ -121,7 +68,7 @@ class Window(QMainWindow):
         ]
 
         # Création et assignation du modèle
-        model2 = af.TableModel(data_table2, headers_table2)
+        model2 = af.TableModel1(data_table2, headers_table2)
         self.ui_main_window.table2.setModel(model2)
 
         # Ajuster la taille des colonnes et des lignes automatiquement
@@ -130,6 +77,33 @@ class Window(QMainWindow):
 
         # Ajuster la taille du widget de la table en fonction du contenu
         af.adjustTableWidgetSize(self.ui_main_window.table2)
+
+##############################################################################################################
+
+        # Données et en-têtes de table3
+        self.headers_table3 = ["c(Hβ)", "E (V-B)", "λ 5007/4959", "λ 6583/6548", "λ 6583/6562"]
+        self.ToolTips3 = [
+            "Coefficient d'extinction",
+            "Exces de couleur",
+            "Rapport des longueurs d'onde [O III] 5007/4959\nValeur théorique : 2.98\nValeur observée : 3.01\n± 0.23",
+            "Rapport des longueurs d'onde [N II] 6583/6548\nValeur théorique : 2.85\nValeur observée : 2.92\n± 0.32",
+            "Rapport des longueurs d'onde [N II] 6583/6562\nIndicant si la nébueluse est ionisée par un rayonnement épais ou fin"
+        ]
+
+        data_table3 = [
+            ["", "", "", "", ""],
+        ]
+
+        # Création et assignation du modèle avec tooltips
+        model3 = af.TableModel2(data_table3, self.headers_table3, self.ToolTips3)
+        self.ui_main_window.table3.setModel(model3)
+        
+        # Ajuster la taille des colonnes et des lignes automatiquement
+        self.ui_main_window.table3.resizeColumnsToContents()
+        self.ui_main_window.table3.resizeRowsToContents()
+
+        # Ajuster la taille du widget de la table en fonction du contenu
+        af.adjustTableWidgetSize(self.ui_main_window.table3)
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -110,13 +110,13 @@ def adjustTableWidgetSize(table):
         table_height += table.rowHeight(row)
 
     # Ajouter des marges si nécessaire
-    table_width += 55  # Pour les bords et le défilement horizontal
-    table_height += 50  # Pour les bords et le défilement vertical
+    table_width += 50  # Pour les bords et le défilement horizontal
+    table_height += 55  # Pour les bords et le défilement vertical
 
     # Redimensionner le widget de la table
     table.setFixedSize(table_width, table_height)
 
-class TableModel(QAbstractTableModel):
+class TableModel1(QAbstractTableModel):
     def __init__(self, data, headers):
         super().__init__()
         self._data = data
@@ -145,8 +145,6 @@ class TableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             if orientation == Qt.Orientation.Horizontal:
                 return self._headers[section]
-            elif orientation == Qt.Orientation.Vertical:
-                return str(section + 1)
         
         elif role == Qt.ItemDataRole.TextAlignmentRole:
             # Centrer les en-têtes
@@ -176,16 +174,22 @@ class TableModel(QAbstractTableModel):
         self._data = data
         self.endResetModel()
 
+
+
 def theme(self):
     self.setStyleSheet("""
         QWidget {
             background-color: #2E3440;
             color: #D8DEE9;
+            font-family: 'Segoe UI';
+            font-size: 12px;
         }
         QPushButton {
             background-color: #4C566A;
             border-radius: 5px;
             padding: 5px 10px;
+            font-family: 'Segoe UI';
+            font-size: 12px;
         }
         QPushButton:hover {
             background-color: #81A1C1;
@@ -194,28 +198,88 @@ def theme(self):
             background-color: #3B4252;
             color: #D8DEE9;
             gridline-color: #4C566A;
+            font-family: 'Segoe UI';
+            font-size: 12px;
         }
         QTableWidget::item {
             padding: 5px;
         }
         QTableWidget::item:selected {
-            background-color: #5E81AC;
+            background-color: #FFC107;
         }
-        QHeaderView::section {
-            background-color: #4C566A;
-            color: #D8DEE9;
+        QHeaderView::section:horizontal {
+            gridline-color: #4C566A;        
             padding: 5px;
+            background-color: #4C566A;
+            font-family: 'Segoe UI';
+            font-size: 12px;
         }
-        QHeaderView::section:checked {
+        QHeaderView::section:horizontal:checked {
             background-color: #5E81AC;
         }
-        QHeaderView::section:pressed {
+        QHeaderView::section:horizontal:pressed {
             background-color: #81A1C1;
         }
-        QHeaderView::section::vertical {
-            border-right: 1px solid #4C566A;
-        }
-        QHeaderView::section::horizontal {
-            border-bottom: 1px solid #4C566A;
+        QToolTip {
+            background-color: #4C566A;
+            color: #D8DEE9;
+            border: 1px solid #D8DEE9;
+            font-family: 'Segoe UI';
+            font-size: 12px;
         }
     """)
+from PyQt6.QtGui import QColor
+
+
+class TableModel2(TableModel1):
+    def __init__(self, data, headers, tooltips):  # Ajout du paramètre tooltips
+        super().__init__(data, headers)
+        self._data = data
+        self._headers = headers
+        self._tooltips = tooltips  # Stockage des tooltips
+        # Définir les couleurs pour les indices des lignes
+        self.index_colors = [
+            QColor(68, 67, 255),    # 4340,47 Å - Bleu clair
+            QColor(64, 63, 255),    # 4363,21 Å - Bleu clair
+            QColor(12, 92, 255),    # 4685,68 Å - Bleu
+            QColor(0, 156, 255),    # 4861,33 Å - Bleu clair
+            QColor(0, 209, 255),    # 4958,92 Å - Bleu clair
+            QColor(0, 255, 255),    # 5006,85 Å - Cyan
+            QColor(255, 204, 0),    # 5754,57 Å - Jaune-orange
+            QColor(255, 190, 0),    # 5875,65 Å - Jaune
+            QColor(255, 73, 0),     # 6548,06 Å - Orange
+            QColor(255, 0, 0),      # 6562,82 Å - Rouge
+            QColor(255, 0, 0),      # 6583,39 Å - Rouge
+            QColor(255, 0, 0),      # 6716,5 Å - Rouge
+            QColor(255, 0, 0)       # 6730,7 Å - Rouge
+        ]
+
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if orientation == Qt.Orientation.Horizontal:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return self._headers[section]
+            elif role == Qt.ItemDataRole.ToolTipRole:
+                return self._tooltips[section]  # Utilisation des tooltips stockés
+
+        if orientation == Qt.Orientation.Vertical:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return str("")  # Pour éppaisseur de la colonne de couleur
+            if role == Qt.ItemDataRole.BackgroundRole:
+                return self.index_colors[section % len(self.index_colors)]
+
+        return None
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid():
+            return None
+            
+        if role == Qt.ItemDataRole.DisplayRole:
+            return str(self._data[index.row()][index.column()])
+            
+        return None
+
+    def rowCount(self, parent=None):
+        return len(self._data)
+
+    def columnCount(self, parent=None):
+        return len(self._headers)
