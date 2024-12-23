@@ -15,21 +15,21 @@ def remplir_tableau(table1, data_import):
     data_Imes = data_Imes.astype(float)
     
     # Récupérer le modèle
-    model = table1.model()
-    print(model)
+    model1 = table1.model()
+
     
     # Step 1: Populate the necessary data in the model
     for i in range(len(data_Imes)):
-        index2 = model.index(i, 2)  # Colonne 2 pour 'I₀Gauss'
-        model.setData(index2, str(data_Imes[i]), Qt.ItemDataRole.DisplayRole)
+        index2 = model1.index(i, 2)  # Colonne 2 pour 'I₀Gauss'
+        model1.setData(index2, str(data_Imes[i]), Qt.ItemDataRole.DisplayRole)
 
-        index3 = model.index(i, 3)  # Colonne 3 pour 'I₀/I(Hβ)=100'
+        index3 = model1.index(i, 3)  # Colonne 3 pour 'I₀/I(Hβ)=100'
         rapport_I = data_Imes[i] / data_Imes[3] * 100
-        model.setData(index3, f"{rapport_I:.1f}", Qt.ItemDataRole.DisplayRole)
+        model1.setData(index3, f"{rapport_I:.1f}", Qt.ItemDataRole.DisplayRole)
 
     # Step 2: Calculate cHβ
     try:
-        index = model.index(9, 3)
+        index = model1.index(9, 3)
         if index.isValid():
             data = index.data()
             if data:
@@ -44,20 +44,20 @@ def remplir_tableau(table1, data_import):
 
     # Step 3: Update the model with the calculated cHβ
     for i in range(len(data_Imes)):
-        index3 = model.index(i, 3)
+        index3 = model1.index(i, 3)
         rapport_I_row = float(index3.data()) if index3.data() else 0
         
-        index4 = model.index(i, 4)  # Colonne 4 pour 'I_c'
-        wavelength = model.index(i, 0).data()
+        index4 = model1.index(i, 4)  # Colonne 4 pour 'I_c'
+        wavelength = model1.index(i, 0).data()
         wavelength = float(wavelength) if wavelength else 0
         
         f_lambda = 2.5634 * (wavelength/10000)**2 - 4.873 * (wavelength/10000) + 1.7636
         I_c = rapport_I_row * 10**(cHβ * f_lambda)
         
-        model.setData(index4, f"{I_c:.1f}", Qt.ItemDataRole.DisplayRole)
+        model1.setData(index4, f"{I_c:.1f}", Qt.ItemDataRole.DisplayRole)
 
-        index5 = model.index(i, 5)  # Colonne 5 pour 'Δ%'
-        model.setData(index5, f"{(rapport_I_row - I_c) / I_c * 100:.0f}", Qt.ItemDataRole.DisplayRole)
+        index5 = model1.index(i, 5)  # Colonne 5 pour 'Δ%'
+        model1.setData(index5, f"{(rapport_I_row - I_c) / I_c * 100:.0f}", Qt.ItemDataRole.DisplayRole)
 
         table1.resizeColumnsToContents()
 
@@ -110,8 +110,8 @@ def adjustTableWidgetSize(table):
         table_height += table.rowHeight(row)
 
     # Ajouter des marges si nécessaire
-    table_width += 50  # Pour les bords et le défilement horizontal
-    table_height += 55  # Pour les bords et le défilement vertical
+    table_width += 10  # Pour les bords et le défilement horizontal
+    table_height += 50  # Pour les bords et le défilement vertical
 
     # Redimensionner le widget de la table
     table.setFixedSize(table_width, table_height)
@@ -174,8 +174,6 @@ class TableModel(QAbstractTableModel):
         self._data = data
         self.endResetModel()
 
-
-
 def theme(self):
     self.setStyleSheet("""
         QWidget {
@@ -229,7 +227,6 @@ def theme(self):
         }
     """)
 from PyQt6.QtGui import QColor
-
 
 class TableModelTooltips(TableModel):
     def __init__(self, data, headers, tooltips):

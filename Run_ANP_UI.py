@@ -7,12 +7,13 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         # Configuration de la fenêtre principale
-        self.setGeometry(50, 50, 1920, 1080)
         af.theme(self)
 
         # Initialisation de l'interface graphique
         self.ui_main_window = Ui_MainWindow()
         self.ui_main_window.setupUi(self)
+        self.setGeometry(0, 0, 1920, 1080)
+
 
         self.ui_main_window.pushButton_import.clicked.connect(lambda: af.remplir_tableau(self.ui_main_window.table1, af.on_pushButton_import_clicked()))
 
