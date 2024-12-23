@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1012, 586)
+        MainWindow.resize(1008, 731)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.pushButton_import = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.table2.setGeometry(QtCore.QRect(10, 390, 121, 81))
         self.table2.setObjectName("table2")
         self.table3 = QtWidgets.QTableView(parent=self.centralwidget)
-        self.table3.setGeometry(QtCore.QRect(10, 480, 121, 81))
+        self.table3.setGeometry(QtCore.QRect(10, 510, 121, 81))
         self.table3.setObjectName("table3")
         MainWindow.setCentralWidget(self.centralwidget)
 

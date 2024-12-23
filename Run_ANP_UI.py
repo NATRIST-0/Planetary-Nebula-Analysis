@@ -47,8 +47,7 @@ class Window(QMainWindow):
 
 
         # Création et assignation du modèle avec tooltips
-        model1 = af.TableModelTooltips(data_table1, self.headers_table1, self.ToolTips1)
-        model1 = af.TableModelColors(data_table1, self.headers_table1)
+        model1 = af.TableModelTooltipsWithColors(data_table1, self.headers_table1, self.ToolTips1)
         self.ui_main_window.table1.setModel(model1)
         
         # Ajuster la taille des colonnes et des lignes automatiquement
@@ -61,7 +60,8 @@ class Window(QMainWindow):
 ##############################################################################################################
 
         # Données et en-têtes de table2
-        headers_table2 = ["n", "Raie", "Valeur mesurée", "Valeur théorique", "Rebleuïssement"]
+        self.headers_table2 = ["n", "Raie", "Valeur mesurée", "Valeur théorique", "Rebleuïssement"]
+        self.ToolTips2 = ["Niveau d'énergie", "Nom de la raie spectrale", "Valeur mesurée de la raie", "Valeur théorique de la raie", "Pourcentage de rebleuïssement"]
         data_table2 = [
             [3, "Hα", "", "", ""],
             [4, "Hβ", "", "", ""],
@@ -69,7 +69,7 @@ class Window(QMainWindow):
         ]
 
         # Création et assignation du modèle
-        model2 = af.TableModel(data_table2, headers_table2)
+        model2 = af.TableModelTooltips(data_table2, self.headers_table2, self.ToolTips2)
         self.ui_main_window.table2.setModel(model2)
 
         # Ajuster la taille des colonnes et des lignes automatiquement

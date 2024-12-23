@@ -273,3 +273,39 @@ class TableModelColors(TableModel):
             if role == Qt.ItemDataRole.BackgroundRole:
                 return self.index_colors[section % len(self.index_colors)]
         return None
+    
+class TableModelTooltipsWithColors(TableModel):
+    def __init__(self, data, headers, tooltips):
+        super().__init__(data, headers)
+        self._tooltips = tooltips
+        self._headers = headers
+        self._data = data
+
+        self.index_colors = [
+            QColor(68, 67, 255),    # 4340,47 Å - Bleu clair
+            QColor(64, 63, 255),    # 4363,21 Å - Bleu clair
+            QColor(12, 92, 255),    # 4685,68 Å - Bleu
+            QColor(0, 156, 255),    # 4861,33 Å - Bleu clair
+            QColor(0, 209, 255),    # 4958,92 Å - Bleu clair
+            QColor(0, 255, 255),    # 5006,85 Å - Cyan
+            QColor(255, 204, 0),    # 5754,57 Å - Jaune-orange
+            QColor(255, 190, 0),    # 5875,65 Å - Jaune
+            QColor(255, 73, 0),     # 6548,06 Å - Orange
+            QColor(255, 0, 0),      # 6562,82 Å - Rouge
+            QColor(255, 0, 0),      # 6583,39 Å - Rouge
+            QColor(255, 0, 0),      # 6716,5 Å - Rouge
+            QColor(255, 0, 0)       # 6730,7 Å - Rouge
+        ]
+
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if orientation == Qt.Orientation.Horizontal:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return self._headers[section]
+            elif role == Qt.ItemDataRole.ToolTipRole:
+                return self._tooltips[section]
+        elif orientation == Qt.Orientation.Vertical:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return str("")
+            if role == Qt.ItemDataRole.BackgroundRole:
+                return self.index_colors[section % len(self.index_colors)]
+        return None
