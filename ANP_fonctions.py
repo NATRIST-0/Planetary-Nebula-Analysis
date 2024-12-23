@@ -116,7 +116,7 @@ def adjustTableWidgetSize(table):
     # Redimensionner le widget de la table
     table.setFixedSize(table_width, table_height)
 
-class TableModel1(QAbstractTableModel):
+class TableModel(QAbstractTableModel):
     def __init__(self, data, headers):
         super().__init__()
         self._data = data
@@ -231,13 +231,22 @@ def theme(self):
 from PyQt6.QtGui import QColor
 
 
-class TableModel2(TableModel1):
-    def __init__(self, data, headers, tooltips):  # Ajout du paramètre tooltips
+class TableModelTooltips(TableModel):
+    def __init__(self, data, headers, tooltips):
         super().__init__(data, headers)
-        self._data = data
-        self._headers = headers
-        self._tooltips = tooltips  # Stockage des tooltips
-        # Définir les couleurs pour les indices des lignes
+        self._tooltips = tooltips
+
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if orientation == Qt.Orientation.Horizontal:
+            if role == Qt.ItemDataRole.DisplayRole:
+                return self._headers[section]
+            elif role == Qt.ItemDataRole.ToolTipRole:
+                return self._tooltips[section]
+        return None
+
+class TableModelColors(TableModel):
+    def __init__(self, data, headers):
+        super().__init__(data, headers)
         self.index_colors = [
             QColor(68, 67, 255),    # 4340,47 Å - Bleu clair
             QColor(64, 63, 255),    # 4363,21 Å - Bleu clair
@@ -258,28 +267,9 @@ class TableModel2(TableModel1):
         if orientation == Qt.Orientation.Horizontal:
             if role == Qt.ItemDataRole.DisplayRole:
                 return self._headers[section]
-            elif role == Qt.ItemDataRole.ToolTipRole:
-                return self._tooltips[section]  # Utilisation des tooltips stockés
-
-        if orientation == Qt.Orientation.Vertical:
+        elif orientation == Qt.Orientation.Vertical:
             if role == Qt.ItemDataRole.DisplayRole:
-                return str("")  # Pour éppaisseur de la colonne de couleur
+                return str("")
             if role == Qt.ItemDataRole.BackgroundRole:
                 return self.index_colors[section % len(self.index_colors)]
-
         return None
-
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
-        if not index.isValid():
-            return None
-            
-        if role == Qt.ItemDataRole.DisplayRole:
-            return str(self._data[index.row()][index.column()])
-            
-        return None
-
-    def rowCount(self, parent=None):
-        return len(self._data)
-
-    def columnCount(self, parent=None):
-        return len(self._headers)

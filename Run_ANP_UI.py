@@ -47,7 +47,8 @@ class Window(QMainWindow):
 
 
         # Création et assignation du modèle avec tooltips
-        model1 = af.TableModel2(data_table1, self.headers_table1, self.ToolTips1)
+        model1 = af.TableModelTooltips(data_table1, self.headers_table1, self.ToolTips1)
+        model1 = af.TableModelColors(data_table1, self.headers_table1)
         self.ui_main_window.table1.setModel(model1)
         
         # Ajuster la taille des colonnes et des lignes automatiquement
@@ -68,7 +69,7 @@ class Window(QMainWindow):
         ]
 
         # Création et assignation du modèle
-        model2 = af.TableModel1(data_table2, headers_table2)
+        model2 = af.TableModel(data_table2, headers_table2)
         self.ui_main_window.table2.setModel(model2)
 
         # Ajuster la taille des colonnes et des lignes automatiquement
@@ -95,7 +96,7 @@ class Window(QMainWindow):
         ]
 
         # Création et assignation du modèle avec tooltips
-        model3 = af.TableModel2(data_table3, self.headers_table3, self.ToolTips3)
+        model3 = af.TableModelTooltips(data_table3, self.headers_table3, self.ToolTips3)
         self.ui_main_window.table3.setModel(model3)
         
         # Ajuster la taille des colonnes et des lignes automatiquement
