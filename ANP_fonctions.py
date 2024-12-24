@@ -5,6 +5,71 @@ from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtCore import Qt, QAbstractTableModel
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.colors
+import pandas as pd
+
+# Fonction pour gérer le clic sur le bouton d'importation
+def import_and_make_plot(self):
+    # Ouvrir une boîte de dialogue pour sélectionner un fichier
+    file_dialog = QFileDialog()
+    file_dialog.setNameFilters(["DAT Files (*.dat)", "All Files (*)"])
+    file_dialog.setWindowTitle("Ouvrir un fichier")
+    
+    if file_dialog.exec():
+        file_path = file_dialog.selectedFiles()[0]
+        if file_path:
+            try:
+                # Définition du spectre
+                mySpectra = pd.read_csv(file_path, sep=" ", header=None, names=['wavelength', 'intensities'])
+                mySpectra = mySpectra[(mySpectra['wavelength'] >= 3800) & (mySpectra['wavelength'] <= 7600)] #keep only the values between 3800 and 7600 Å
+
+                print("Données importées avec succès.")
+                # Create the plot after successful import
+                create_and_update_plot(self, mySpectra, file_path)
+                return mySpectra, file_path
+            except Exception as e:
+                print(f"Erreur lors du traitement : {e}")
+                return None
+        else:
+            print("Aucun fichier sélectionné.")
+
+
+# Fonction pour créer et mettre à jour le graphique
+def create_and_update_plot(self, mySpectra, file_path):
+    self.ax.clear()
+    
+    wavelengths = mySpectra['wavelength']
+    spectrum = mySpectra['intensities']
+
+    # Configuration des couleurs
+    clim = (3800, 7500)
+    norm = plt.Normalize(*clim)
+    wl = np.arange(clim[0], clim[1] + 1, 2)
+    colorlist = list(zip(norm(wl), [wavelength_to_rgb(w) for w in wl]))
+    spectralmap = matplotlib.colors.LinearSegmentedColormap.from_list("spectrum", colorlist)
+
+    # Tracé du spectre d'intensité
+    self.ax.plot(wavelengths, spectrum, color='black', linewidth=1)
+
+    # Création de l'image du spectre
+    extent = (np.min(wavelengths), np.max(wavelengths), np.min(spectrum), np.max(spectrum))
+    self.ax.imshow(np.tile(wavelengths, (len(spectrum), 1)), 
+    aspect='auto', extent=extent, cmap=spectralmap, clim=clim)
+
+    # Configuration du graphique
+    self.ax.set_xlabel('Longueur d\'onde (Å)', color="white")
+    self.ax.set_ylabel('Intensité mesurée', color="white")
+    self.ax.set_ylim(0, 0.8*max(mySpectra['intensities']))
+    self.ax.tick_params(axis='both', colors='white')
+    self.ax.set_title(f'Spectre de {file_path.split("/")[-1].split(".")[0]}', color = "white", size=16)
+    self.figure.set_facecolor('#4C566A')
+
+    # Remplissage de la zone sous la courbe et contour
+    self.ax.fill_between(wavelengths, max(spectrum), spectrum, color="black")
+    
+    # Mise à jour du canvas
+    self.canvas.draw()
 
 def wavelength_to_rgb(wavelength, gamma=1):
     """Convertit une longueur d'onde (Å) en une couleur RGB approximative."""
@@ -144,7 +209,7 @@ def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parame
 
 
 # Fonction pour gérer le clic sur le bouton d'importation
-def on_pushButton_import_clicked():
+def on_pushButton_import1_clicked():
     # Ouvrir une boîte de dialogue pour sélectionner un fichier
     file_dialog = QFileDialog()
     file_dialog.setNameFilters(["TXT Files (*.txt)", "All Files (*)"])

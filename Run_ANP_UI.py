@@ -1,14 +1,8 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from ANP import Ui_MainWindow
 import ANP_fonctions as af
-
-# Création du graphique
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors
-import pandas as pd
 from PyQt6.QtWidgets import QVBoxLayout
 
 
@@ -24,7 +18,8 @@ class Window(QMainWindow):
         self.setGeometry(0, 0, 1920, 1080)
 
 
-        self.ui_main_window.pushButton_import.clicked.connect(lambda: af.remplir_tableau(self.ui_main_window.table1, self.ui_main_window.table2, self.ui_main_window.table3, af.on_pushButton_import_clicked()))
+        self.ui_main_window.pushButton_import1.clicked.connect(lambda: af.remplir_tableau(self.ui_main_window.table1, self.ui_main_window.table2, self.ui_main_window.table3, af.on_pushButton_import1_clicked()))
+        self.ui_main_window.pushButton_import2.clicked.connect(lambda: af.import_and_make_plot(self))
 
 ##############################################################################################################
     
@@ -122,56 +117,12 @@ class Window(QMainWindow):
         self.figure = Figure(figsize=(8, 4))
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.add_subplot(111)
+        self.figure.set_facecolor('#4C566A')
+        self.ax.set_facecolor('black')
         
         # Ajout du canvas au layout existant
         layout = QVBoxLayout(self.ui_main_window.graph_layout)
         layout.addWidget(self.canvas)
-
-        # Fonction pour créer et mettre à jour le graphique
-        def update_graph(self):
-            self.ax.clear()
-            
-            # Définition du spectre
-            file_path = r"C:\Users\GAYRARD\Documents\GitHub\Planetary-Nebula-Analysis\add ons\_m42_20230220_862_Olivier Gayrard.dat"
-            mySpectra = pd.read_csv(file_path, sep=" ", header=None, names=['wavelength', 'intensities'])
-            mySpectra = mySpectra[(mySpectra['wavelength'] >= 3800) & (mySpectra['wavelength'] <= 7600)] #keep only the values between 3800 and 7600 Å
-
-            wavelengths = mySpectra['wavelength']
-            spectrum = mySpectra['intensities']
-
-            # Configuration des couleurs
-            clim = (3800, 7500)
-            norm = plt.Normalize(*clim)
-            wl = np.arange(clim[0], clim[1] + 1, 2)
-            colorlist = list(zip(norm(wl), [af.wavelength_to_rgb(w) for w in wl]))
-            spectralmap = matplotlib.colors.LinearSegmentedColormap.from_list("spectrum", colorlist)
-
-            # Tracé du spectre d'intensité
-            self.ax.plot(wavelengths, spectrum, color='black', linewidth=1)
-
-            # Création de l'image du spectre
-            extent = (np.min(wavelengths), np.max(wavelengths), np.min(spectrum), np.max(spectrum))
-            self.ax.imshow(np.tile(wavelengths, (len(spectrum), 1)), 
-            aspect='auto', extent=extent, cmap=spectralmap, clim=clim)
-
-            # Configuration du graphique
-            self.ax.set_xlabel('Longueur d\'onde (Å)', color="white")
-            self.ax.set_ylabel('Intensité mesurée', color="white")
-            self.ax.set_ylim(0, max(mySpectra['intensities']))
-            self.ax.tick_params(axis='both', colors='white')
-            self.ax.set_title(f'Spectre de {file_path.split("\\")[-1].split(".")[0]}', color="white")
-            self.figure.set_facecolor('#4C566A')
-
-            # Remplissage de la zone sous la courbe et contour
-            self.ax.fill_between(wavelengths, max(spectrum), spectrum, color="black")
-            
-            # Mise à jour du canvas
-            self.canvas.draw()
-
-        # Appel initial pour afficher le graphique
-        update_graph(self)
-
-
 
 if __name__ == "__main__":
     app = QApplication([])

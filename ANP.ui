@@ -14,19 +14,6 @@
    <string>Analyse Nébuleuse Planétaire</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton_import">
-    <property name="geometry">
-     <rect>
-      <x>11</x>
-      <y>11</y>
-      <width>141</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Import de données</string>
-    </property>
-   </widget>
    <widget class="QTableView" name="table1">
     <property name="geometry">
      <rect>
@@ -70,12 +57,38 @@
    <widget class="QWidget" name="graph_layout" native="true">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>470</x>
       <y>40</y>
-      <width>841</width>
-      <height>621</height>
+      <width>1031</width>
+      <height>661</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>10</y>
+      <width>257</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_import1">
+       <property name="text">
+        <string>Import de données1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_import2">
+       <property name="text">
+        <string>Import de données2</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
