@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
-    <height>731</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,6 +54,26 @@
       <y>510</y>
       <width>121</width>
       <height>81</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTableView" name="table4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>630</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="graph_layout" native="true">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>40</y>
+      <width>841</width>
+      <height>621</height>
      </rect>
     </property>
    </widget>

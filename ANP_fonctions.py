@@ -1,13 +1,51 @@
 """
 Analyse Nébuleuse Planétaire _ Fonctions
 """
-import PyQt6.QtWidgets as QtWidgets
-from PyQt6.QtWidgets import QFileDialog, QTableWidgetItem
+from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtCore import Qt, QAbstractTableModel
 import pandas as pd
 import numpy as np
 
-def remplir_tableau(table1, data_import):
+def wavelength_to_rgb(wavelength, gamma=1):
+    """Convertit une longueur d'onde (Å) en une couleur RGB approximative."""
+    wavelength = float(wavelength)
+    if 3800 <= wavelength <= 7500:
+        A = 1.0
+    else:
+        A = 0.5
+    wavelength = max(3800, min(wavelength, 7500))
+    
+    if 3800 <= wavelength <= 4400:
+        attenuation = 0.3 + 0.7 * (wavelength - 3800) / (4400 - 3800)
+        R = ((-(wavelength - 4400) / (4400 - 3800)) * attenuation) ** gamma
+        G = 0.0
+        B = (1.0 * attenuation) ** gamma
+    elif 4400 <= wavelength <= 4900:
+        R = 0.0
+        G = ((wavelength - 4400) / (4900 - 4400)) ** gamma
+        B = 1.0
+    elif 4900 <= wavelength <= 5100:
+        R = 0.0
+        G = 1.0
+        B = (-(wavelength - 5100) / (5100 - 4900)) ** gamma
+    elif 510 <= wavelength <= 580:
+        R = ((wavelength - 5100) / (5800 - 5100)) ** gamma
+        G = 1.0
+        B = 0.0
+    elif 5800 <= wavelength <= 6450:
+        R = 1.0
+        G = (-(wavelength - 6450) / (6450 - 5800)) ** gamma
+        B = 0.0
+    elif 6450 <= wavelength <= 7500:
+        attenuation = 0.3 + 0.7 * (7500 - wavelength) / (7500 - 6450)
+        R = (1.0 * attenuation) ** gamma
+        G = 0.0
+        B = 0.0
+    else:
+        R, G, B = 0.0, 0.0, 0.0
+    return (R, G, B, A)
+
+def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parameter
     if data_import is None:
         return
         
@@ -16,8 +54,9 @@ def remplir_tableau(table1, data_import):
     
     # Récupérer le modèle
     model1 = table1.model()
+    model2 = table2.model()
+    model3 = table3.model()
 
-    
     # Step 1: Populate the necessary data in the model
     for i in range(len(data_Imes)):
         index2 = model1.index(i, 2)  # Colonne 2 pour 'I₀Gauss'
@@ -42,6 +81,23 @@ def remplir_tableau(table1, data_import):
         print(f"Error: {e}")
         cHβ = 3.08 * np.log10(1) - 7.55
 
+    # Put cHβ in table2
+    index_chb = model3.index(0, 0)  # Row 0, Column 0
+    model3.setData(index_chb, f"{cHβ:.3f}", Qt.ItemDataRole.DisplayRole)
+    
+    # Put cHβ/1.46 in table2
+    index_evb = model3.index(0, 1)  # Row 1, Column 0
+    model3.setData(index_evb, f"{cHβ/1.46:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    # Valeur mesuré dans table2
+    indexv_mes1 = model2.index(0, 2)  # Colonne 2 pour 'Valeur mesurée'
+    HI1 = float(model1.index(9, 3).data() or 0) / 100
+    model2.setData(indexv_mes1, f"{HI1:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    indexv_mes2 = model2.index(2, 2)  # Colonne 2 pour 'Valeur mesurée'
+    HI2 = float(model1.index(0, 3).data() or 0) / 100
+    model2.setData(indexv_mes2, f"{HI2:.3f}", Qt.ItemDataRole.DisplayRole)
+
     # Step 3: Update the model with the calculated cHβ
     for i in range(len(data_Imes)):
         index3 = model1.index(i, 3)
@@ -61,7 +117,31 @@ def remplir_tableau(table1, data_import):
 
         table1.resizeColumnsToContents()
 
+    # Step 4: Update the model with the calculated rebleuïssement
+    index_rebleuie1 = model2.index(0, 4)
+    rebleuie1 = float(model1.index(9, 4).data()) / 100
+    model2.setData(index_rebleuie1, f"{rebleuie1:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    
+    index_rebleuie2 = model2.index(2, 4)
+    rebleuie2 = float(model1.index(0, 4).data()) / 100
+    model2.setData(index_rebleuie2, f"{rebleuie2:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    # Ajout des rapports de lambda 5 4      4 4 
+    index_lambda1 = model3.index(0, 2)
+    lambda1 = float(model1.index(5, 4).data()) / float(model1.index(4, 4).data())
+    model3.setData(index_lambda1, f"{lambda1:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    index_lambda2 = model3.index(0, 3)
+    lambda2 = float(model1.index(10, 4).data()) / float(model1.index(8, 4).data())
+    model3.setData(index_lambda2, f"{lambda2:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    index_lambda3 = model3.index(0, 4)
+    lambda3 = float(model1.index(10, 4).data()) / float(model1.index(9, 4).data())
+    model3.setData(index_lambda3, f"{lambda3:.3f}", Qt.ItemDataRole.DisplayRole)
+
     return table1
+
 
 # Fonction pour gérer le clic sur le bouton d'importation
 def on_pushButton_import_clicked():
@@ -83,7 +163,7 @@ def on_pushButton_import_clicked():
                 data_import[['Line', 'Imes']] = data_import[['Line', 'Imes']].replace(" ", None)
                 
                 # Afficher les données importées
-                print(data_import)
+                # print(data_import)
                 print("Données importées avec succès.")
                 
                 return data_import

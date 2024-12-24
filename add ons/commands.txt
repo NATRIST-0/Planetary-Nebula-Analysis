@@ -1,1 +1,1 @@
-uic -g python form.ui > ui_form.py
+python -m PyQt6.uic.pyuic ANP.ui -o ANP.py
