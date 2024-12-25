@@ -18,7 +18,7 @@ class Window(QMainWindow):
         self.setGeometry(0, 0, 1920, 1080)
 
 
-        self.ui_main_window.pushButton_import1.clicked.connect(lambda: af.remplir_tableau(self.ui_main_window.table1, self.ui_main_window.table2, self.ui_main_window.table3, af.on_pushButton_import1_clicked()))
+        self.ui_main_window.pushButton_import1.clicked.connect(lambda: af.remplir_tableau(self.ui_main_window.table1, self.ui_main_window.table2, self.ui_main_window.table3, self.ui_main_window.table4, af.on_pushButton_import1_clicked()))
         self.ui_main_window.pushButton_import2.clicked.connect(lambda: af.import_and_make_plot(self))
 
 ##############################################################################################################
@@ -110,6 +110,29 @@ class Window(QMainWindow):
 
         # Ajuster la taille du widget de la table en fonction du contenu
         af.adjustTableWidgetSize(self.ui_main_window.table3)
+
+##############################################################################################################
+
+        # Données et en-têtes de table4
+        self.headers_table4 = ["R[OIII]", "R[NII]", "R[SII]"]
+        self.ToolTips4 = ["à venir","à venir","à venir"]
+
+        data_table4 = [
+            ["", "", ""],
+            ["T (K)", "T (K)", "Ne (cm-3)"],
+            ["", "", ""],
+        ]
+
+        # Création et assignation du modèle avec tooltips
+        model4 = af.TableModelTooltips(data_table4, self.headers_table4, self.ToolTips4)
+        self.ui_main_window.table4.setModel(model4)
+        
+        # Ajuster la taille des colonnes et des lignes automatiquement
+        self.ui_main_window.table4.resizeColumnsToContents()
+        self.ui_main_window.table4.resizeRowsToContents()
+
+        # Ajuster la taille du widget de la table en fonction du contenu
+        af.adjustTableWidgetSize(self.ui_main_window.table4)
 
 ##############################################################################################################
 

@@ -50,7 +50,7 @@ def create_and_update_plot(self, mySpectra, file_path):
     spectralmap = matplotlib.colors.LinearSegmentedColormap.from_list("spectrum", colorlist)
 
     # Tracé du spectre d'intensité
-    self.ax.plot(wavelengths, spectrum, color='black', linewidth=1)
+    self.ax.plot(wavelengths, spectrum, color='black', linewidth=0.1)
 
     # Création de l'image du spectre
     extent = (np.min(wavelengths), np.max(wavelengths), np.min(spectrum), np.max(spectrum))
@@ -60,7 +60,7 @@ def create_and_update_plot(self, mySpectra, file_path):
     # Configuration du graphique
     self.ax.set_xlabel('Longueur d\'onde (Å)', color="white")
     self.ax.set_ylabel('Intensité mesurée', color="white")
-    self.ax.set_ylim(0, 0.8*max(mySpectra['intensities']))
+    self.ax.set_ylim(0, max(mySpectra['intensities']))
     self.ax.tick_params(axis='both', colors='white')
     self.ax.set_title(f'Spectre de {file_path.split("/")[-1].split(".")[0]}', color = "white", size=16)
     self.figure.set_facecolor('#4C566A')
@@ -93,7 +93,7 @@ def wavelength_to_rgb(wavelength, gamma=1):
         R = 0.0
         G = 1.0
         B = (-(wavelength - 5100) / (5100 - 4900)) ** gamma
-    elif 510 <= wavelength <= 580:
+    elif 5100 <= wavelength <= 5800:
         R = ((wavelength - 5100) / (5800 - 5100)) ** gamma
         G = 1.0
         B = 0.0
@@ -110,7 +110,7 @@ def wavelength_to_rgb(wavelength, gamma=1):
         R, G, B = 0.0, 0.0, 0.0
     return (R, G, B, A)
 
-def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parameter
+def remplir_tableau(table1, table2, table3, table4, data_import):  # Added table2 parameter
     if data_import is None:
         return
         
@@ -121,6 +121,8 @@ def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parame
     model1 = table1.model()
     model2 = table2.model()
     model3 = table3.model()
+    model4 = table4.model()
+
 
     # Step 1: Populate the necessary data in the model
     for i in range(len(data_Imes)):
@@ -192,7 +194,7 @@ def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parame
     rebleuie2 = float(model1.index(0, 4).data()) / 100
     model2.setData(index_rebleuie2, f"{rebleuie2:.3f}", Qt.ItemDataRole.DisplayRole)
 
-    # Ajout des rapports de lambda 5 4      4 4 
+    # Ajout des rapports de lambda
     index_lambda1 = model3.index(0, 2)
     lambda1 = float(model1.index(5, 4).data()) / float(model1.index(4, 4).data())
     model3.setData(index_lambda1, f"{lambda1:.3f}", Qt.ItemDataRole.DisplayRole)
@@ -204,6 +206,34 @@ def remplir_tableau(table1, table2, table3, data_import):  # Added table2 parame
     index_lambda3 = model3.index(0, 4)
     lambda3 = float(model1.index(10, 4).data()) / float(model1.index(9, 4).data())
     model3.setData(index_lambda3, f"{lambda3:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    # Remplissage de la table 4 (y, x) ##ERREUR ICI ?
+    index4_ROIII = model4.index(0, 0)
+    ROIII = ((float(model1.index(5, 4).data()) + float(model1.index(4, 4).data())) / float(model1.index(1, 3).data()))
+    model4.setData(index4_ROIII, f"{ROIII:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    index4_RNII = model4.index(0, 1)
+    RNII = ((float(model1.index(10, 4).data()) + float(model1.index(8, 4).data())) / float(model1.index(6, 4).data()))
+    model4.setData(index4_RNII, f"{RNII:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    index4_RSII = model4.index(0, 2)
+    RSII = ((float(model1.index(11, 4).data())) / float(model1.index(12, 4).data()))
+    model4.setData(index4_RSII, f"{RSII:.3f}", Qt.ItemDataRole.DisplayRole)
+
+    #=3,29*10000/LN($J15/7,9)
+    index4_ROIII_T = model4.index(2, 0)
+    ROIII_T = 3.29 * 10000 / np.log(ROIII/7.9)
+    model4.setData(index4_ROIII_T, f"{ROIII_T:.0f}", Qt.ItemDataRole.DisplayRole)
+
+    #=2,5*10000/(LN($J$17/8,23))
+    index4_RNII_T = model4.index(2, 1)
+    RNII_T = 2.5 * 10000 / np.log(RNII/8.23)
+    model4.setData(index4_RNII_T, f"{RNII_T:.0f}", Qt.ItemDataRole.DisplayRole)
+
+    #=100*RACINE(L17)*(J19-1,49)/(5,62-12,8*J19)
+    index4_RSII_T = model4.index(2, 2)
+    RSII_T = 100 * np.sqrt(RNII_T) * (RSII - 1.49) / (5.62 - 12.8 * RSII)
+    model4.setData(index4_RSII_T, f"{RSII_T:.0f}", Qt.ItemDataRole.DisplayRole)
 
     return table1
 
